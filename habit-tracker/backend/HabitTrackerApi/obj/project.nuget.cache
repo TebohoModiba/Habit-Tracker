@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "2ICE5kPQ85w=",
+  "dgSpecHash": "zMckhfpTKeo=",
   "success": true,
-  "projectFilePath": "E:\\Github portfolio\\habit-tracker\\backend\\HabitTrackerApi\\HabitTrackerApi.csproj",
+  "projectFilePath": "C:\\Users\\Admin\\OneDrive\\Documents\\GitHub\\Habit-Tracker\\habit-tracker\\backend\\HabitTrackerApi\\HabitTrackerApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.4\\microsoft.aspnetcore.openapi.10.0.4.nupkg.sha512",
     "C:\\Users\\Admin\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
