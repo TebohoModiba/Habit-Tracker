@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import globalStyles from '../Styles/globalStyle';
+import habitService from '../Functions/habitService';
 
 const SignUp = ({ navigation }: any) => {
 
@@ -8,8 +9,43 @@ const SignUp = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState(''); 
+  const [lastName, setLastName] = useState('');
 
   const handleSignUp = () => {
+
+    // Check all fields are filled in
+    const fieldsCheck = habitService.fieldValidation({
+      username,
+      email,
+      password,
+      confirmPassword,
+    });
+    if (!fieldsCheck.valid) {
+      Alert.alert('Missing Field', fieldsCheck.message);
+      return;
+    }
+
+    // Check email format
+    const emailCheck = habitService.emailValidation(email);
+    if (!emailCheck.valid) {
+      Alert.alert('Invalid Email', emailCheck.message);
+      return;
+    }
+
+    // Check password strength
+    const passwordCheck = habitService.passwordValidation(password);
+    if (!passwordCheck.valid) {
+      Alert.alert('Invalid Password', passwordCheck.message);
+      return;
+    }
+
+    // Check passwords match
+    if (password !== confirmPassword) {
+      Alert.alert('Password Mismatch', 'Passwords do not match. Please try again.');
+      return;
+    }
+
     // TODO: connect to C# API
   };
 
@@ -27,6 +63,22 @@ const SignUp = ({ navigation }: any) => {
       <Text style={globalStyles.mutedText}>Start building better habits today</Text>
 
       <View style={globalStyles.divider} />
+
+      {/*Firstname input */}
+      <TextInput
+        style={globalStyles.input}
+        placeholder="First Name"
+        value={firstName}
+        onChangeText={setFirstName}
+      />
+
+      {/* Lastname input */}
+      <TextInput
+        style={globalStyles.input}
+        placeholder="Last Name"
+        value={lastName}
+        onChangeText={setLastName}
+      />
 
       {/* Username Input */}
       <TextInput

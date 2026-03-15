@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image,Alert } from 'react-native';
 import globalStyles from '../Styles/globalStyle';
+import habitService from '../Functions/habitService';
 
 const SignIn = ({ navigation }: any) => {
 
@@ -8,6 +9,27 @@ const SignIn = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
 
   const handleSignIn = () => {
+
+    const fieldsCheck = habitService.fieldValidation({
+      email,
+      password,
+    });
+
+    if (!fieldsCheck.valid) {
+      Alert.alert('Missing Field', fieldsCheck.message);
+      return;
+    }
+
+    if(!habitService.emailValidation(email).valid) {
+      Alert.alert('Invalid Email', habitService.emailValidation(email).message);
+      return;
+    }
+
+    if(!habitService.passwordValidation(password).valid) {
+      Alert.alert('Invalid Password', habitService.passwordValidation(password).message);
+      return;
+    }
+
     // TODO: connect to C# API
   };
 

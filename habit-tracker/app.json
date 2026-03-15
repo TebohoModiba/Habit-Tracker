@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "habit-tracker",
-    "slug": "habit-tracker",
+    "name": "Habit-Tracker",
+    "slug": "Habit-Tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/Logo.png",

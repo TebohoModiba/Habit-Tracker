@@ -1,41 +1,42 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Firestore;
+using HabitTrackerApi.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// ─── Firebase Setup ───────────────────────────────────────────
+var firebaseKeyPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "firebase-adminsdk.json");
+
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", firebaseKeyPath);
+
+FirebaseApp.Create(new AppOptions
+{
+    Credential = await GoogleCredential.GetApplicationDefaultAsync()
+});
+
+FirestoreDb firestoreDb = FirestoreDb.Create("habittracker-d63f1");
+builder.Services.AddSingleton(firestoreDb);
+
+// ─── Register Services ────────────────────────────────────────
+builder.Services.AddScoped<AuthService>();
+
+// ─── Add Controllers & Swagger ────────────────────────────────
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ─── Middleware Pipeline ──────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
