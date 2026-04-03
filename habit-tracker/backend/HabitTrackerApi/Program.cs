@@ -20,11 +20,23 @@ builder.Services.AddSingleton(firestoreDb);
 
 // ─── Register Services ────────────────────────────────────────
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<HabitService>();
+builder.Services.AddScoped<SuggestionService>();
+
+// ─── HTTP Client (used by SuggestionService to call Grok) ─────
+builder.Services.AddHttpClient();
 
 // ─── Add Controllers & Swagger ────────────────────────────────
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// ─── CORS (allow React Native dev server) ─────────────────────
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 var app = builder.Build();
 
@@ -35,6 +47,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

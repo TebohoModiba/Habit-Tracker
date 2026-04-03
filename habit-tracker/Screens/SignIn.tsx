@@ -1,36 +1,49 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image,Alert } from 'react-native';
+import {
+  View, Text, TextInput, TouchableOpacity,
+  ScrollView, Image, Alert, ActivityIndicator,
+} from 'react-native';
 import globalStyles from '../Styles/globalStyle';
 import habitService from '../Functions/habitService';
+import apiService from '../Functions/apiService';
 
 const SignIn = ({ navigation }: any) => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignIn = () => {
-
-    const fieldsCheck = habitService.fieldValidation({
-      email,
-      password,
-    });
-
+  const handleSignIn = async () => {
+    // Validate fields
+    const fieldsCheck = habitService.fieldValidation({ email, password });
     if (!fieldsCheck.valid) {
       Alert.alert('Missing Field', fieldsCheck.message);
       return;
     }
 
-    if(!habitService.emailValidation(email).valid) {
+    if (!habitService.emailValidation(email).valid) {
       Alert.alert('Invalid Email', habitService.emailValidation(email).message);
       return;
     }
 
-    if(!habitService.passwordValidation(password).valid) {
+    if (!habitService.passwordValidation(password).valid) {
       Alert.alert('Invalid Password', habitService.passwordValidation(password).message);
       return;
     }
 
-    // TODO: connect to C# API
+    setLoading(true);
+    try {
+      const result = await apiService.login({ email, password });
+      // Navigate to Home, passing user info
+      navigation.replace('Home', {
+        userId: result.userId,
+        username: result.username,
+        firstName: result.firstName,
+      });
+    } catch (error: any) {
+      Alert.alert('Sign In Failed', error.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,6 +69,7 @@ const SignIn = ({ navigation }: any) => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        editable={!loading}
       />
 
       {/* Password Input */}
@@ -65,15 +79,23 @@ const SignIn = ({ navigation }: any) => {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        editable={!loading}
       />
 
       {/* Sign In Button */}
-      <TouchableOpacity style={globalStyles.button} onPress={handleSignIn}>
-        <Text style={globalStyles.buttonText}>Sign In</Text>
+      <TouchableOpacity
+        style={[globalStyles.button, loading && { opacity: 0.7 }]}
+        onPress={handleSignIn}
+        disabled={loading}
+      >
+        {loading
+          ? <ActivityIndicator color="#fff" />
+          : <Text style={globalStyles.buttonText}>Sign In</Text>
+        }
       </TouchableOpacity>
 
       {/* Navigate to Sign Up */}
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+      <TouchableOpacity onPress={() => navigation.navigate('SignUp')} disabled={loading}>
         <Text style={globalStyles.mutedText}>
           Don't have an account?{' '}
           <Text style={{ color: '#9a8c98', fontWeight: 'bold' }}>Sign Up</Text>

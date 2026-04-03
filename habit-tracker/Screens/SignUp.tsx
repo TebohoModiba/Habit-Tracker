@@ -1,52 +1,62 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import {
+  View, Text, TextInput, TouchableOpacity,
+  ScrollView, Image, Alert, ActivityIndicator,
+} from 'react-native';
 import globalStyles from '../Styles/globalStyle';
 import habitService from '../Functions/habitService';
+import apiService from '../Functions/apiService';
 
 const SignUp = ({ navigation }: any) => {
-
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [firstName, setFirstName] = useState(''); 
-  const [lastName, setLastName] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
-
-    // Check all fields are filled in
+  const handleSignUp = async () => {
+    // Validate all fields present
     const fieldsCheck = habitService.fieldValidation({
-      username,
-      email,
-      password,
-      confirmPassword,
+      firstName, lastName, username, email, password, confirmPassword,
     });
     if (!fieldsCheck.valid) {
       Alert.alert('Missing Field', fieldsCheck.message);
       return;
     }
 
-    // Check email format
+    // Validate email format
     const emailCheck = habitService.emailValidation(email);
     if (!emailCheck.valid) {
       Alert.alert('Invalid Email', emailCheck.message);
       return;
     }
 
-    // Check password strength
+    // Validate password strength
     const passwordCheck = habitService.passwordValidation(password);
     if (!passwordCheck.valid) {
       Alert.alert('Invalid Password', passwordCheck.message);
       return;
     }
 
-    // Check passwords match
+    // Passwords match
     if (password !== confirmPassword) {
       Alert.alert('Password Mismatch', 'Passwords do not match. Please try again.');
       return;
     }
 
-    // TODO: connect to C# API
+    setLoading(true);
+    try {
+      await apiService.register({ firstName, lastName, username, email, password });
+      Alert.alert('Account Created!', 'You can now sign in.', [
+        { text: 'Sign In', onPress: () => navigation.navigate('SignIn') },
+      ]);
+    } catch (error: any) {
+      Alert.alert('Sign Up Failed', error.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -64,32 +74,28 @@ const SignUp = ({ navigation }: any) => {
 
       <View style={globalStyles.divider} />
 
-      {/*Firstname input */}
       <TextInput
         style={globalStyles.input}
         placeholder="First Name"
         value={firstName}
         onChangeText={setFirstName}
+        editable={!loading}
       />
-
-      {/* Lastname input */}
       <TextInput
         style={globalStyles.input}
         placeholder="Last Name"
         value={lastName}
         onChangeText={setLastName}
+        editable={!loading}
       />
-
-      {/* Username Input */}
       <TextInput
         style={globalStyles.input}
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
+        editable={!loading}
       />
-
-      {/* Email Input */}
       <TextInput
         style={globalStyles.input}
         placeholder="Email"
@@ -97,33 +103,37 @@ const SignUp = ({ navigation }: any) => {
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        editable={!loading}
       />
-
-      {/* Password Input */}
       <TextInput
         style={globalStyles.input}
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        editable={!loading}
       />
-
-      {/* Confirm Password Input */}
       <TextInput
         style={globalStyles.input}
         placeholder="Confirm Password"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
+        editable={!loading}
       />
 
-      {/* Sign Up Button */}
-      <TouchableOpacity style={globalStyles.button} onPress={handleSignUp}>
-        <Text style={globalStyles.buttonText}>Sign Up</Text>
+      <TouchableOpacity
+        style={[globalStyles.button, loading && { opacity: 0.7 }]}
+        onPress={handleSignUp}
+        disabled={loading}
+      >
+        {loading
+          ? <ActivityIndicator color="#fff" />
+          : <Text style={globalStyles.buttonText}>Sign Up</Text>
+        }
       </TouchableOpacity>
 
-      {/* Navigate to Sign In */}
-      <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+      <TouchableOpacity onPress={() => navigation.navigate('SignIn')} disabled={loading}>
         <Text style={globalStyles.mutedText}>
           Already have an account?{' '}
           <Text style={{ color: '#9a8c98', fontWeight: 'bold' }}>Sign In</Text>
