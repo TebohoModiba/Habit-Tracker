@@ -1,6 +1,8 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 // ─── Base URL ─────────────────────────────────────────────────────────────────
-// Change this to your deployed API URL for production
-const BASE_URL = 'http://10.0.2.2:5000/api'; // Android emulator → localhost
+const BASE_URL = 'http://192.168.1.89:5000/api'; // Physical device → PC WiFi IP
+// const BASE_URL = 'http://10.0.2.2:5000/api'; // Android emulator
 // const BASE_URL = 'http://localhost:5000/api'; // iOS simulator
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -23,6 +25,7 @@ export interface AuthResponse {
     userId: string;
     username: string;
     firstName: string;
+    token: string;          // ✅ Added token field (your backend must return it)
 }
 
 export interface HabitPayload {
@@ -31,7 +34,7 @@ export interface HabitPayload {
     description: string;
     frequency: 'daily' | 'weekly';
     targetCount: number;
-    startDate: string; // ISO string
+    startDate: string;
 }
 
 export interface Habit {
@@ -71,8 +74,13 @@ async function handleResponse<T>(res: Response): Promise<T> {
     return data as T;
 }
 
-function jsonHeaders() {
-    return { 'Content-Type': 'application/json' };
+// Get stored token for authenticated requests
+async function getAuthHeaders(): Promise<HeadersInit> {
+    const token = await AsyncStorage.getItem('token');
+    return {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    };
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -80,7 +88,7 @@ function jsonHeaders() {
 async function register(payload: RegisterPayload): Promise<{ message: string; userId: string }> {
     const res = await fetch(`${BASE_URL}/auth/register`, {
         method: 'POST',
-        headers: jsonHeaders(),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
     return handleResponse(res);
@@ -89,60 +97,81 @@ async function register(payload: RegisterPayload): Promise<{ message: string; us
 async function login(payload: LoginPayload): Promise<AuthResponse> {
     const res = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
-        headers: jsonHeaders(),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
-    return handleResponse(res);
+    const data = await handleResponse<AuthResponse>(res);
+
+    // ✅ Store token and user data after successful login
+    await AsyncStorage.setItem('token', data.token);
+    await AsyncStorage.setItem('user', JSON.stringify({
+        userId: data.userId,
+        email: payload.email,
+        username: data.username,
+        firstName: data.firstName,
+    }));
+
+    return data;
+}
+
+async function logout(): Promise<void> {
+    await AsyncStorage.multiRemove(['token', 'user']);
 }
 
 // ─── Habits ───────────────────────────────────────────────────────────────────
 
 async function createHabit(payload: HabitPayload): Promise<Habit> {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/habits`, {
         method: 'POST',
-        headers: jsonHeaders(),
+        headers,
         body: JSON.stringify(payload),
     });
     return handleResponse(res);
 }
 
 async function getHabitsByUser(userId: string): Promise<Habit[]> {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/habits/user/${userId}`, {
         method: 'GET',
-        headers: jsonHeaders(),
+        headers,
     });
     return handleResponse(res);
 }
 
 async function getHabitById(habitId: string): Promise<Habit> {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/habits/${habitId}`, {
         method: 'GET',
-        headers: jsonHeaders(),
+        headers,
     });
     return handleResponse(res);
 }
 
 async function updateHabit(habitId: string, payload: HabitPayload): Promise<Habit> {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/habits/${habitId}`, {
         method: 'PUT',
-        headers: jsonHeaders(),
+        headers,
         body: JSON.stringify(payload),
     });
     return handleResponse(res);
 }
 
 async function deleteHabit(habitId: string): Promise<{ message: string }> {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/habits/${habitId}`, {
         method: 'DELETE',
-        headers: jsonHeaders(),
+        headers,
     });
     return handleResponse(res);
 }
 
 async function markHabitComplete(habitId: string): Promise<Habit> {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/habits/${habitId}/complete`, {
         method: 'PATCH',
-        headers: jsonHeaders(),
+        headers,
     });
     return handleResponse(res);
 }
@@ -150,9 +179,10 @@ async function markHabitComplete(habitId: string): Promise<Habit> {
 // ─── Suggestions ──────────────────────────────────────────────────────────────
 
 async function getSuggestions(userId: string): Promise<SuggestionResponse> {
+    const headers = await getAuthHeaders();
     const res = await fetch(`${BASE_URL}/suggestions/${userId}`, {
         method: 'POST',
-        headers: jsonHeaders(),
+        headers,
     });
     return handleResponse(res);
 }
@@ -162,6 +192,7 @@ async function getSuggestions(userId: string): Promise<SuggestionResponse> {
 const apiService = {
     register,
     login,
+    logout,
     createHabit,
     getHabitsByUser,
     getHabitById,

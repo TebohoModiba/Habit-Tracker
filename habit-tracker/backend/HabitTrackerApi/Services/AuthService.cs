@@ -8,10 +8,12 @@ namespace HabitTrackerApi.Services
     public class AuthService
     {
         private readonly FirestoreDb _db;
+        private readonly TokenService _tokenService;   // ✅ added
 
-        public AuthService(FirestoreDb db)
+        public AuthService(FirestoreDb db, TokenService tokenService)
         {
             _db = db;
+            _tokenService = tokenService;
         }
 
         public async Task<AuthResult> RegisterAsync(RegisterDto dto)
@@ -94,13 +96,17 @@ namespace HabitTrackerApi.Services
                     return new AuthResult { Success = false, Message = "Invalid email or password." };
                 }
 
+                // ✅ Generate JWT token
+                var token = _tokenService.GenerateToken(user.UserId, user.Username, user.FirstName);
+
                 return new AuthResult
                 {
                     Success = true,
                     Message = "Login successful.",
                     UserId = user.UserId,
                     Username = user.Username,
-                    FirstName = user.FirstName
+                    FirstName = user.FirstName,
+                    Token = token   // ✅ include token
                 };
             }
             catch (Exception ex)

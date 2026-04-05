@@ -20,7 +20,6 @@ namespace HabitTrackerApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            // Check if all fields are provided
             if (string.IsNullOrWhiteSpace(registerDto.FirstName) ||
                 string.IsNullOrWhiteSpace(registerDto.LastName) ||
                 string.IsNullOrWhiteSpace(registerDto.Username) ||
@@ -33,9 +32,7 @@ namespace HabitTrackerApi.Controllers
             var result = await _authService.RegisterAsync(registerDto);
 
             if (!result.Success)
-            {
                 return BadRequest(new { message = result.Message });
-            }
 
             return Ok(new { message = result.Message, userId = result.UserId });
         }
@@ -44,7 +41,6 @@ namespace HabitTrackerApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            // Check if all fields are provided
             if (string.IsNullOrWhiteSpace(loginDto.Email) ||
                 string.IsNullOrWhiteSpace(loginDto.Password))
             {
@@ -54,16 +50,16 @@ namespace HabitTrackerApi.Controllers
             var result = await _authService.LoginAsync(loginDto);
 
             if (!result.Success)
-            {
                 return Unauthorized(new { message = result.Message });
-            }
 
+            // ✅ Return token in response
             return Ok(new
             {
                 message = result.Message,
                 userId = result.UserId,
                 username = result.Username,
-                firstName = result.FirstName
+                firstName = result.FirstName,
+                token = result.Token
             });
         }
     }

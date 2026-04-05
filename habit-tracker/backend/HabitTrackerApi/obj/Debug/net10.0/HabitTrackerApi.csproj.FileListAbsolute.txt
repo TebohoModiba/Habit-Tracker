@@ -59,3 +59,13 @@ C:\Users\Admin\OneDrive\Documents\Github\Habit-Tracker\habit-tracker\backend\Hab
 C:\Users\Admin\OneDrive\Documents\Github\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\obj\Debug\net10.0\HabitTrackerApi.pdb
 C:\Users\Admin\OneDrive\Documents\Github\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\obj\Debug\net10.0\HabitTrackerApi.genruntimeconfig.cache
 C:\Users\Admin\OneDrive\Documents\Github\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\obj\Debug\net10.0\ref\HabitTrackerApi.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Google.GenAI.dll
+C:\Users\Admin\OneDrive\Documents\GitHub\Habit-Tracker\habit-tracker\backend\HabitTrackerApi\bin\Debug\net10.0\Microsoft.Extensions.AI.Abstractions.dll

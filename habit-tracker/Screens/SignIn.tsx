@@ -3,41 +3,39 @@ import {
   View, Text, TextInput, TouchableOpacity,
   ScrollView, Image, Alert, ActivityIndicator,
 } from 'react-native';
-import globalStyles from '../Styles/globalStyle';
+import { useTheme } from '../Context/ThemeContext';
+import { createGlobalStyles } from '../Styles/globalStyle';
 import habitService from '../Functions/habitService';
 import apiService from '../Functions/apiService';
 
 const SignIn = ({ navigation }: any) => {
+  const { colors } = useTheme();
+  const globalStyles = createGlobalStyles(colors);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSignIn = async () => {
-    // Validate fields
     const fieldsCheck = habitService.fieldValidation({ email, password });
     if (!fieldsCheck.valid) {
       Alert.alert('Missing Field', fieldsCheck.message);
       return;
     }
-
     if (!habitService.emailValidation(email).valid) {
       Alert.alert('Invalid Email', habitService.emailValidation(email).message);
       return;
     }
-
     if (!habitService.passwordValidation(password).valid) {
       Alert.alert('Invalid Password', habitService.passwordValidation(password).message);
       return;
     }
-
     setLoading(true);
     try {
       const result = await apiService.login({ email, password });
-      // Navigate to Home, passing user info
-      navigation.replace('Home', {
+      navigation.replace('MainTabs', {
         userId: result.userId,
         username: result.username,
-        firstName: result.firstName,
+        firstName: result.firstName
       });
     } catch (error: any) {
       Alert.alert('Sign In Failed', error.message || 'Something went wrong. Please try again.');
@@ -48,20 +46,10 @@ const SignIn = ({ navigation }: any) => {
 
   return (
     <ScrollView contentContainerStyle={globalStyles.centeredContainer}>
-
-      {/* Logo */}
-      <Image
-        source={require('../assets/Logo.png')}
-        style={{ width: 100, height: 100, marginBottom: 10 }}
-        resizeMode="contain"
-      />
-
+      <Image source={require('../assets/Logo.png')} style={{ width: 100, height: 100, marginBottom: 10 }} resizeMode="contain" />
       <Text style={globalStyles.title}>Welcome Back 👋</Text>
       <Text style={globalStyles.mutedText}>Sign in to continue</Text>
-
       <View style={globalStyles.divider} />
-
-      {/* Email Input */}
       <TextInput
         style={globalStyles.input}
         placeholder="Email"
@@ -71,8 +59,6 @@ const SignIn = ({ navigation }: any) => {
         autoCapitalize="none"
         editable={!loading}
       />
-
-      {/* Password Input */}
       <TextInput
         style={globalStyles.input}
         placeholder="Password"
@@ -81,27 +67,18 @@ const SignIn = ({ navigation }: any) => {
         secureTextEntry
         editable={!loading}
       />
-
-      {/* Sign In Button */}
       <TouchableOpacity
         style={[globalStyles.button, loading && { opacity: 0.7 }]}
         onPress={handleSignIn}
         disabled={loading}
       >
-        {loading
-          ? <ActivityIndicator color="#fff" />
-          : <Text style={globalStyles.buttonText}>Sign In</Text>
-        }
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={globalStyles.buttonText}>Sign In</Text>}
       </TouchableOpacity>
-
-      {/* Navigate to Sign Up */}
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')} disabled={loading}>
         <Text style={globalStyles.mutedText}>
-          Don't have an account?{' '}
-          <Text style={{ color: '#9a8c98', fontWeight: 'bold' }}>Sign Up</Text>
+          Don't have an account? <Text style={{ color: colors.primary, fontWeight: 'bold' }}>Sign Up</Text>
         </Text>
       </TouchableOpacity>
-
     </ScrollView>
   );
 };

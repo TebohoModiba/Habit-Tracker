@@ -1,15 +1,51 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
-# dependencies
-node_modules/
+# ============================================
+# Secrets & API Keys (Gemini, Firebase, JWT)
+# ============================================
+# Never commit real keys!
+appsettings.json
+appsettings.*.json
+!appsettings.example.json        # Allow a template file with placeholders
 
-# Expo
+# Firebase Admin SDK key (service account)
+firebase-adminsdk.json
+*-adminsdk-*.json
+google-credentials.json
+service-account*.json
+
+# .NET User Secrets (local development only)
+secrets.json
+*.secrets.json
+
+# Environment variables (contain API keys, etc.)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# ============================================
+# Dependencies & Build Outputs
+# ============================================
+node_modules/
 .expo/
 dist/
 web-build/
 expo-env.d.ts
 
-# Native
+# .NET build artifacts
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+TestResults/
+
+# ============================================
+# Native mobile (generated)
+# ============================================
 .kotlin/
 *.orig.*
 *.jks
@@ -17,25 +53,29 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+/ios
+/android
 
-# Metro
+# ============================================
+# Metro bundler & debug logs
+# ============================================
 .metro-health-check*
-
-# debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# macOS
+# ============================================
+# OS junk files
+# ============================================
 .DS_Store
+Thumbs.db
+desktop.ini
 *.pem
 
-# local env files
-.env*.local
-
-# typescript
+# ============================================
+# TypeScript build info (optional)
+# ============================================
 *.tsbuildinfo
-
-# generated native folders
-/ios
-/android

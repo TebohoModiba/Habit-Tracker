@@ -1,8 +1,7 @@
 import React from 'react';
 
 function passwordValidation(password: string): { valid: boolean; message: string } {
-  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
   if (!regex.test(password)) {
     return {
       valid: false,
