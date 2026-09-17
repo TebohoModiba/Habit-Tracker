@@ -1,2 +1,5 @@
 # .gitignore
 firebase-adminsdk.json
+appsettings.json
+appsettings.*.json
+!appsettings.example.json    
